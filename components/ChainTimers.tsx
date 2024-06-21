@@ -11,11 +11,28 @@ interface Timer {
   remaining: number;
 }
 
+const STORAGE_KEY = 'chainTimersState';
+
 const ChainTimers: React.FC = () => {
-  const [timers, setTimers] = useState<Timer[]>([{ title: 'Timer 1', duration: 60, remaining: 60 }]);
+  const [timers, setTimers] = useState<Timer[]>([]);
   const [activeTimer, setActiveTimer] = useState<number>(0);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const lastUpdateTime = useRef<number>(0);
+
+  // Load timers from localStorage on initial render
+  useEffect(() => {
+    const storedTimers = localStorage.getItem(STORAGE_KEY);
+    if (storedTimers) {
+      setTimers(JSON.parse(storedTimers));
+    } else {
+      setTimers([{ title: 'Timer 1', duration: 60, remaining: 60 }]);
+    }
+  }, []);
+
+  // Save timers to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(timers));
+  }, [timers]);
 
   const playBeep = useCallback(() => {
     const AudioContext = window.AudioContext || (window as any).webkitAudioContext;

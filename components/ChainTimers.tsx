@@ -21,6 +21,25 @@ const ChainTimers: React.FC = () => {
   const [activeTimer, setActiveTimer] = useState<number>(0);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const lastUpdateTime = useRef<number>(0);
+  
+  function useIsMobile() {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+      const checkIsMobile = () => {
+        setIsMobile(window.innerWidth <= 768);
+      };
+      
+      checkIsMobile();
+      window.addEventListener('resize', checkIsMobile);
+      
+      return () => window.removeEventListener('resize', checkIsMobile);
+    }, []);
+
+    return isMobile;
+  }
+
+  const isMobile = useIsMobile();
 
   // Load timers from localStorage on initial render
   useEffect(() => {
@@ -172,7 +191,6 @@ const ChainTimers: React.FC = () => {
   }
 
 
-
   return (
     <div className="p-4 max-w-md mx-auto relative">
 
@@ -227,31 +245,33 @@ const ChainTimers: React.FC = () => {
         <Button onClick={resetTimers}>Reset</Button>
       </div>
 
-
-      <div className="flex justify-center">
-      <div className="fixed right-20 mt-8">
-      <div className="text-center mb-4"> <h1 className='text-2xl'>Current Timer</h1></div>
-      <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-      <CircularProgress variant="determinate" size="20rem" value={currentTimerProgress()} />
-      <Box
-        sx={{
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          position: 'absolute',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Typography variant="h1" component="div" color="text.secondary">
-          {`${Math.round(currentTimerSeconds())}`}
-        </Typography>
-      </Box>
-    </Box>
-      </div>
-      </div>
+        
+        {isMobile ? (<></>) : 
+          (<div>
+          <div className="flex justify-center">
+          <div className="fixed right-20 mt-8">
+          <div className="text-center mb-4"> <h1 className='text-2xl'>Current Timer</h1></div>
+          <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+          <CircularProgress variant="determinate" size="20rem" value={currentTimerProgress()} />
+          <Box
+            sx={{
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+              position: 'absolute',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography variant="h1" component="div" color="text.secondary">
+              {`${Math.round(currentTimerSeconds())}`}
+            </Typography>
+          </Box>
+        </Box>
+          </div>
+          </div>
 
    <div className="flex justify-center">
       <div className="fixed left-20 mt-8">
@@ -276,7 +296,7 @@ const ChainTimers: React.FC = () => {
       </Box>
     </Box>
       </div>
-      </div>
+      </div></div>)}
 
       </div>
     </div>
